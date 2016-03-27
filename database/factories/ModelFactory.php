@@ -11,6 +11,7 @@
 |
 */
 
+// For creating users
 $factory->define(App\User::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->name,
@@ -18,4 +19,12 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'password' => bcrypt(str_random(10)),
         'remember_token' => str_random(10),
     ];
+});
+
+
+// For creating posts
+$factory->define(App\Post::class, function (Faker\Generator $faker) {
+    return [
+        'content' => $faker->sentence,
+    ] ;
 });
