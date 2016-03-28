@@ -25,6 +25,6 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
 // For creating posts
 $factory->define(App\Post::class, function (Faker\Generator $faker) {
     return [
-        'content' => $faker->sentence,
+        'post_content' => $faker->sentence,
     ] ;
 });
