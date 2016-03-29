@@ -20,8 +20,8 @@
             border: 4px solid red;
             height: 300px;
         }
-        #post-container {
-            border: 1px dotted green;
+        .post-container {
+            border: 4px dotted green;
         }
         .post {
             border: 1px dotted blue;
