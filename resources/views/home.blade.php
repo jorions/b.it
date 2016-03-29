@@ -12,6 +12,24 @@
 
     <!-- Styles -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <style>
+        #all-posts {
+            border: 4px solid black;
+        }
+        #liked-posts {
+            border: 4px solid red;
+            height: 300px;
+        }
+        #post-container {
+            border: 1px dotted green;
+        }
+        .post {
+            border: 1px dotted blue;
+        }
+
+    </style>
+
+
 
 </head>
 <body>
