@@ -27,7 +27,7 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        return App\User::with('posts')->find($id);
+        return App\User::with('likes')->find($id);
     }
 
 
