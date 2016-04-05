@@ -26,16 +26,20 @@ var PostsCollection = Backbone.Collection.extend({
 var PostsListView = Backbone.View.extend({
     el: '<div class="post-container"></div>',
 
+    // Gets 'posts' as a parameter from render()
     template: _.template('\
         <% posts.each(function(post) { %>\
             <div class="post"><%= post.get("post_content") %></div>\
         <% }) %>\
     '),
 
+    // Gets 'collection' from HomeView's render(), which instantiates postListView with 'collection' as a parameter
+    // This method automatically runs whenever its class is instantiated
     initialize: function() {
         this.listenTo(this.collection, 'update', this.render);
     },
 
+    // Gets 'collection' from HomeView's render(), which instantiates postListView with 'collection' as a parameter
     render: function() {
         this.$el.html(this.template({ posts: this.collection }));
         return this;
