@@ -47,7 +47,7 @@ class PostsController extends Controller
      */
     public function show($id)
     {
-        return App\Post::with('user.likes')->find($id);
+        return App\Post::with('user.posts')->find($id);
     }
 
 

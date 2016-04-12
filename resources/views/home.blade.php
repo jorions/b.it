@@ -14,17 +14,48 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
     <style>
         #all-posts {
-            border: 4px solid black;
+            height: 400px;
+            overflow: scroll;
         }
-        #liked-posts {
-            border: 4px solid red;
-            height: 300px;
+        #main-window {
+            height: 600px;
+            overflow: scroll;
         }
-        .post-container {
-            border: 4px dotted green;
+        #post-form {
+            height: 75px;
         }
-        .post {
-            border: 1px dotted blue;
+
+        /*.post-container {*/
+            /*border: 4px dotted blue;*/
+        /*}*/
+
+        .post div {
+            border-bottom: 1px dotted darkgray;
+            line-height: 15px;
+            padding: 7px;
+        }
+        a {
+            text-decoration: none;
+        }
+        .title {
+            background-color: lightseagreen;
+            color:white;
+            font-size: 20px;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            margin-bottom: 0px;
+        }
+
+        input[type="button"] {
+            margin-bottom: 0px;
+            width: 100%;
+            color: gray;
+        }
+        #content-container {
+            margin-bottom: 40px;
+            border: 1px solid darkgray;
         }
 
     </style>

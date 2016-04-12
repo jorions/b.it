@@ -13,8 +13,16 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        // If a request is not passed into the route with "currentUser=true", then just show all users. Otherwise return
+        // only the current user with all of their likes
+        // first() is used because where() returns an array, and in the array is just the 1 user, so this pulls out the
+        // first user as just an object
+        if ($request->currentUser) {
+            return App\User::where('id', \Auth::user()->id)->with('likes')->first();
+        }
+
         return App\User::all();
     }
 
@@ -27,7 +35,7 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        return App\User::with('likes')->find($id);
+        return App\User::with('posts')->find($id);
     }
 
 
