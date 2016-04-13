@@ -72,7 +72,7 @@ var PostsListView = Backbone.View.extend({
                         collection: posts
                     });
                     $('#main-window').html(usersPostsListView.render().el);
-                    var mainTitle = "Posts by " + clickedUser.get('name');
+                    var mainTitle = "posts by " + clickedUser.get('name');
                     $('#main-title').html(mainTitle);
                 }
             });
@@ -149,8 +149,6 @@ var HomeView = Backbone.View.extend({
     render: function() {
         this.insertAllPosts();
 
-        this.$el.find('#main-title').html('favorited posts');
-
         return this;
     },
 
@@ -172,23 +170,35 @@ var HomeView = Backbone.View.extend({
         // the collection of 'likes' that we got from this.user
         var postsListView = new PostsListView({ collection: this.user.get('likes') });
         this.$el.find('#main-window').html(postsListView.render().el);
-        this.$el.find('#main-title').html('favorited posts');
+        this.$el.find('#main-title').html('your favorited posts');
     },
 
     createPost: function() {
 
         //var postContent = $('#new-post').value;
 
+        // Get the value of the text input
         var postContent = document.getElementsByName('new-post')[0].value;
 
-        var newPost = new PostModel();
-        newPost.set({
-            post_content: postContent
-        });
+        // If the input is empty, tell the user with an alert
+        if(postContent === "") {
 
-        newPost.save();
+            alert("please enter a post");
 
-        this.insertAllPosts();
+        // Otherwise, create a new post, save it to the backend, re-render the posts to update the list, then clear
+        // the text field
+        } else {
+            var newPost = new PostModel();
+            newPost.set({
+                post_content: postContent
+            });
+
+            newPost.save();
+
+            this.insertAllPosts();
+
+            this.$el.find('#new-post').val("");
+        }
     }
 });
 

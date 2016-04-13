@@ -18,7 +18,7 @@
             overflow: scroll;
         }
         #main-window {
-            height: 600px;
+            height: 550px;
             overflow: scroll;
         }
         #post-form {
@@ -33,6 +33,8 @@
             border-bottom: 1px dotted darkgray;
             line-height: 15px;
             padding: 7px;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
         }
         a {
             text-decoration: none;
@@ -42,20 +44,28 @@
             color:white;
             font-size: 20px;
             text-align: center;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
         }
         input[type="text"] {
             width: 100%;
             margin-bottom: 0px;
+            border-radius: 0;
         }
 
         input[type="button"] {
             margin-bottom: 0px;
             width: 100%;
             color: gray;
+            border-top-right-radius: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 9px;
+            border-bottom-right-radius: 9px;
         }
         #content-container {
             margin-bottom: 40px;
             border: 1px solid darkgray;
+            border-radius: 10px;
         }
 
     </style>
