@@ -4,13 +4,8 @@
 <div class="container">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
-            <div class="panel panel-default">
-                <div class="panel-heading">Welcome</div>
-
-                <div class="panel-body">
-                    Your Application's Landing Page.
-                </div>
-            </div>
+            <span style="font-size: 190px; color: #3592b2;">b.itter</span>
+            <h1>&nbsp;the basic twitter</h1>
         </div>
     </div>
 </div>

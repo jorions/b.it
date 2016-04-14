@@ -46,7 +46,7 @@ var PostsListView = Backbone.View.extend({
     // Gets 'posts' as a parameter from render()
     template: _.template('\
         <% posts.each(function(post) { %>\
-            <a class="post-container" href="#" data-user-id="<%= post.get("user_id") %>">\
+            <a class="post-container" href="#">\
                 <div class="post" data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
                     <%= post.get("post_content") %>\
                     <% if(post.get("user")) { %>\
@@ -77,7 +77,7 @@ var PostsListView = Backbone.View.extend({
                     posts.fetch();
                     var usersPostsListView = new PostsListView({ collection: posts });
                     $('#main-window').html(usersPostsListView.render().el);
-                    $('#main-window').height("408px");
+                    $('#main-window').height("410px");
                     var mainTitle = "posts by @" + clickedUser.get('name');
                     $('#main-title').html(mainTitle);
                     $('#favorites-button').html("&rarr; click to see your favorites &larr;");
@@ -117,9 +117,12 @@ var PostView = Backbone.View.extend({
         <div class="title-post-viewer">\
             &darr; <%= model.get("post_content") %> &darr;\
         </div>\
-        <br />\
         <div class="post-viewer-details">\
-            <h4>posted by @<%= model.get("user").name %> on <%= model.get("updated_at").substring(0,10) %></h4>\
+            <h4>\
+                posted by @<%= model.get("user").name %>\
+                <br />\
+                <%= model.get("updated_at").substring(0,10) %>\
+            </h4>\
         </div>\
     '),
 
@@ -164,7 +167,10 @@ var HomeView = Backbone.View.extend({
                     <div id="main-window"></div>\
                     <div id="post-viewer-container">\
                         <div class="title-post-viewer">&darr; post detail area &darr;</div>\
-                        <div class="post-viewer-details"><h4>no post clicked yet</h4></div>\
+                        <div class="post-viewer-details">\
+                            <br />\
+                            <h4>no post clicked yet</h4>\
+                        </div>\
                     </div>\
                 </div>\
             </div>\
@@ -233,7 +239,7 @@ var HomeView = Backbone.View.extend({
         var postsListView = new PostsListView({ collection: this.user.get('likes') });
         this.$el.find('#main-window').html(postsListView.render().el);
         this.$el.find('#main-title').html('your favorited posts');
-        this.$el.find('#main-window').height("440px");
+        this.$el.find('#main-window').height("442px");
         this.$el.find('#favorites-button').html("");
         this.$el.find('#error').html("");
         //this.$el.find('#post-viewer-container').html("<div class='post-viewer-title'></div><h1>no post selected</h1>");
