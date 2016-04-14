@@ -15,7 +15,8 @@ class PostsController extends Controller
      */
     public function index()
     {
-        return App\Post::all();
+        //return App\Post::all();
+        return App\Post::with('user')->orderBy('updated_at', 'desc')->get();
     }
 
 

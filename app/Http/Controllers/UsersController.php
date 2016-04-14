@@ -20,7 +20,7 @@ class UsersController extends Controller
         // first() is used because where() returns an array, and in the array is just the 1 user, so this pulls out the
         // first user as just an object
         if ($request->currentUser) {
-            return App\User::where('id', \Auth::user()->id)->with('likes')->first();
+            return App\User::where('id', \Auth::user()->id)->with('likes.user')->first();
         }
 
         return App\User::all();

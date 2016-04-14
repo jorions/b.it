@@ -12,7 +12,8 @@ $.ajaxSetup({
 
 var PostModel = Backbone.Model.extend({
     urlRoot: '/api/posts/',
-    idAttribute: 'id'
+    idAttribute: 'id',
+
 });
 
 
@@ -45,9 +46,15 @@ var PostsListView = Backbone.View.extend({
     // Gets 'posts' as a parameter from render()
     template: _.template('\
         <% posts.each(function(post) { %>\
-            <a class="post" href="#" data-user-id="<%= post.get("user_id") %>">\
-                <div class="post" data-user-id="<%= post.get("user_id") %>">\
+            <a class="post-container" href="#" data-user-id="<%= post.get("user_id") %>">\
+                <div class="post" data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
                     <%= post.get("post_content") %>\
+                    <% if(post.get("user")) { %>\
+                        <span>\
+                            <br />\
+                            @<%= post.get("user").name %>\
+                        </span>\
+                    <% }; %>\
                 </div>\
             </a>\
         <% }) %>\
@@ -68,16 +75,27 @@ var PostsListView = Backbone.View.extend({
                 success: function() {
                     var posts = new PostsCollection(clickedUser.get('posts'));
                     posts.fetch();
-                    var usersPostsListView = new PostsListView({
-                        collection: posts
-                    });
+                    var usersPostsListView = new PostsListView({ collection: posts });
                     $('#main-window').html(usersPostsListView.render().el);
-                    var mainTitle = "posts by " + clickedUser.get('name');
+                    $('#main-window').height("408px");
+                    var mainTitle = "posts by @" + clickedUser.get('name');
                     $('#main-title').html(mainTitle);
+                    $('#favorites-button').html("&rarr; click to see your favorites &larr;");
+                    $('#error').html("");
+
+                }
+            });
+
+            var clickedPost = new PostModel({ id: $(event.target).data('id') });
+            clickedPost.fetch({
+                success: function() {
+                    var postView = new PostView({ model: clickedPost });
+                    $('#post-viewer-container').html(postView.render().el);
                 }
             });
         }
     },
+
 
     // Gets 'collection' from HomeView's render(), which instantiates postListView with 'collection' as a parameter
     // This method automatically runs whenever its class is instantiated
@@ -92,6 +110,28 @@ var PostsListView = Backbone.View.extend({
     }
 });
 
+var PostView = Backbone.View.extend({
+    el: '<div class="post-viewer"></div>',
+
+    template: _.template('\
+        <div class="title-post-viewer">\
+            &darr; <%= model.get("post_content") %> &darr;\
+        </div>\
+        <br />\
+        <div class="post-viewer-details">\
+            <h4>posted by @<%= model.get("user").name %> on <%= model.get("updated_at").substring(0,10) %></h4>\
+        </div>\
+    '),
+
+    initialize: function() {
+        this.listenTo(this.model, 'change', this.render);
+    },
+
+    render: function() {
+        this.$el.html(this.template({ model: this.model }));
+        return this;
+    }
+});
 
 
 var HomeView = Backbone.View.extend({
@@ -110,14 +150,22 @@ var HomeView = Backbone.View.extend({
                             <div class="title">create a post</div>\
                             <div id="post-form">\
                                 <input type="text" id="new-post" name="new-post" placeholder="enter post" />\
-                                <input type="button" id="submit" value="submit" />\
+                                <div id="error"></div>\
+                                <div id="submit">submit</div>\
                             </div>\
                         </div>\
                     </div>\
                 </div>\
                 <div class="eight columns" id="content-container">\
                     <div class="title" id="main-title"></div>\
+                    <a href="#">\
+                        <div class="title-favorites" id="favorites-button"></div>\
+                    </a>\
                     <div id="main-window"></div>\
+                    <div id="post-viewer-container">\
+                        <div class="title-post-viewer">&darr; post detail area &darr;</div>\
+                        <div class="post-viewer-details"><h4>no post clicked yet</h4></div>\
+                    </div>\
                 </div>\
             </div>\
         </div>\
@@ -125,29 +173,43 @@ var HomeView = Backbone.View.extend({
 
     // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger the UserController's
     // index() to return the current user with all of their likes
-    initialize: function() {
-        this.user = new UserModel();
-
-        this.user.fetch({
-            data: {
-                currentUser: true
-            }
-        });
-
-        // Listen to syncs on this.user. fetch() is asynchronous, so it won't run when it is first called, it will run
-        // after everything else that isn't asynchronous has run. So when we fetch above it is actually just making
-        // this.user into an empty shell. So if we were to just try to render the user's likes in the render() below, it
-        // wouldn't work. Instead we need to have a function that adds the likes to the el that runs whenever this.user
-        // syncs, and this.user syncs once it successfully runs fetch()
-        this.listenTo(this.user, 'sync', this.insertLikes);
-    },
+    // initialize: function() {
+    //     this.user = new UserModel();
+    //
+    //     this.user.fetch({
+    //         data: {
+    //             currentUser: true
+    //         }
+    //     });
+    //
+    //     // Listen to syncs on this.user. fetch() is asynchronous, so it won't run when it is first called, it will run
+    //     // after everything else that isn't asynchronous has run. So when we fetch above it is actually just making
+    //     // this.user into an empty shell. So if we were to just try to render the user's likes in the render() below, it
+    //     // wouldn't work. Instead we need to have a function that adds the likes to the el that runs whenever this.user
+    //     // syncs, and this.user syncs once it successfully runs fetch()
+    //     this.listenTo(this.user, 'sync', this.insertLikes);
+    // },
 
     events: {
-        "click #submit": "createPost"
+        "click #submit": "createPost",
+
+        "click #favorites-button": "insertLikes"
     },
 
     render: function() {
         this.insertAllPosts();
+        var that = this;
+
+        this.user = new UserModel();
+        this.user.fetch({
+            data: {
+                currentUser: true
+            },
+            success: function() {
+                that.insertLikes();
+            }
+        });
+
 
         return this;
     },
@@ -171,6 +233,10 @@ var HomeView = Backbone.View.extend({
         var postsListView = new PostsListView({ collection: this.user.get('likes') });
         this.$el.find('#main-window').html(postsListView.render().el);
         this.$el.find('#main-title').html('your favorited posts');
+        this.$el.find('#main-window').height("440px");
+        this.$el.find('#favorites-button').html("");
+        this.$el.find('#error').html("");
+        //this.$el.find('#post-viewer-container').html("<div class='post-viewer-title'></div><h1>no post selected</h1>");
     },
 
     createPost: function() {
@@ -183,7 +249,7 @@ var HomeView = Backbone.View.extend({
         // If the input is empty, tell the user with an alert
         if(postContent === "") {
 
-            alert("please enter a post");
+            $('#error').html("please enter a post");
 
         // Otherwise, create a new post, save it to the backend, re-render the posts to update the list, then clear
         // the text field
@@ -197,7 +263,11 @@ var HomeView = Backbone.View.extend({
 
             this.insertAllPosts();
 
-            this.$el.find('#new-post').val("");
+            $('#new-post').val("");
+
+            $('#error').html("");
+
+
         }
     }
 });
@@ -206,6 +276,7 @@ var HomeView = Backbone.View.extend({
 
 var homeView = new HomeView();
 $('#content').html(homeView.render().el);
+
 
 // QUESTIONS
 // WHY ARE MY REQUESTS SHOWING UP TWICE?

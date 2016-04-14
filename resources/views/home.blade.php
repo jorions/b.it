@@ -18,18 +18,18 @@
             overflow: scroll;
         }
         #main-window {
-            height: 550px;
+            height: 440px;
             overflow: scroll;
         }
-        #post-form {
-            height: 75px;
-        }
+        /*#post-form {*/
+            /*height: 75px;*/
+        /*}*/
 
         /*.post-container {*/
             /*border: 4px dotted blue;*/
         /*}*/
 
-        .post div {
+        .post-container div {
             border-bottom: 1px dotted darkgray;
             line-height: 15px;
             padding: 7px;
@@ -41,31 +41,75 @@
         }
         .title {
             background-color: lightseagreen;
-            color:white;
+            color: white;
             font-size: 20px;
             text-align: center;
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
         }
+        .title-favorites {
+            background-color: #3592b2;
+            color: white;
+            font-size: 20px;
+            text-align: center;
+        }
+        .title-post-viewer {
+            background-color: #d6d1d3;
+            color: white;
+            font-size: 20px;
+            text-align: center;
+        }
+        .post-viewer-details {
+            text-align: center;
+            color: #3592b2;
+        }
+
+        #error {
+            background-color: rgba(205, 52, 55, 0.81);
+            color: white;
+            font-size: 20px;
+            text-align: center;
+        }
+
         input[type="text"] {
             width: 100%;
             margin-bottom: 0px;
             border-radius: 0;
         }
 
-        input[type="button"] {
+        #submit {
             margin-bottom: 0px;
             width: 100%;
-            color: gray;
+            background-color: #3592b2;
+            color: white;
+            height: 38px;
+            font-size: 20px;
+            line-height: 33px;
+            text-align: center;
             border-top-right-radius: 0;
             border-top-left-radius: 0;
             border-bottom-left-radius: 9px;
             border-bottom-right-radius: 9px;
         }
+        #submit:hover {
+            border: 1px solid gray;
+        }
+        #submit:active {
+            background-color: #2e7c98;
+            color: #d5d5d5;
+        }
+
         #content-container {
             margin-bottom: 40px;
             border: 1px solid darkgray;
             border-radius: 10px;
+        }
+        #post-viewer-container {
+            height: 110px;
+        }
+        span {
+            font-size: 12px;
+            color: #d6d1d3;
         }
 
     </style>
