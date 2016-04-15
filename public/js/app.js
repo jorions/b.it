@@ -50,7 +50,7 @@ var PostsListView = Backbone.View.extend({
                 <div class="post" data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
                     <%= post.get("post_content") %>\
                     <% if(post.get("user")) { %>\
-                        <span>\
+                        <span data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
                             <br />\
                             @<%= post.get("user").name %>\
                         </span>\

@@ -54,6 +54,7 @@
 
         .logo {
             font-size: 40px;
+            color: #3592b2;
         }
         .title {
             background-color: lightseagreen;
