@@ -33,13 +33,6 @@
             height: 442px;
             overflow: scroll;
         }
-        /*#post-form {*/
-        /*height: 75px;*/
-        /*}*/
-
-        /*.post-container {*/
-        /*border: 4px dotted blue;*/
-        /*}*/
 
         .post-container {
             border-bottom: 1px dotted darkgray;
