@@ -41,7 +41,7 @@
         /*border: 4px dotted blue;*/
         /*}*/
 
-        .post-container div {
+        .post-container {
             border-bottom: 1px dotted darkgray;
             line-height: 15px;
             padding: 7px;
@@ -55,6 +55,29 @@
         .logo {
             font-size: 40px;
             color: #3592b2;
+        }
+        .post {
+            width: 70%;
+            display: inline-block;
+        }
+        .heart {
+            font-size: 60px;
+            width: 20%;
+            display: inline-block;
+            text-align: right;
+            padding-top: 10px;
+        }
+        #heart-normal {
+            color: #efe9ec;
+        }
+        #heart-normal:hover {
+            color: #d6d1d3;
+        }
+        #heart-favorited {
+            color: rgba(225, 57, 60, 0.81);
+        }
+        #heart-favorited:hover {
+            color: rgba(205, 52, 55, 0.81);
         }
         .title {
             background-color: lightseagreen;

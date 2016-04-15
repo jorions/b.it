@@ -19,7 +19,7 @@ var PostModel = Backbone.Model.extend({
 var UserModel = Backbone.Model.extend({
     urlRoot: '/api/users/',
     idAttribute: 'id',
-    
+
     // For /api/users/, when a response with "currentUser=true" is passed into the route, the route returns both a user
     // and all of its likes
     parse: function(response) {
@@ -42,25 +42,25 @@ var PostsCollection = Backbone.Collection.extend({
 var PostsListView = Backbone.View.extend({
     el: '<div class="post-list-container"></div>',
 
-    // Gets 'posts' as a parameter from render()
-    template: _.template('\
-        <% posts.each(function(post) { %>\
-            <div class="post-container" href="#">\
-                <a class="post" data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
-                    <%= post.get("post_content") %>\
-                    <% if(post.get("user")) { %>\
-                        <span data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
-                            <br />\
-                            @<%= post.get("user").name %>\
-                        </span>\
-                    <% }; %>\
-                </a>\
-                <div class="heart" id="heart-normal" data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
-                    &hearts;\
-                </div>\
-            </div>\
-        <% }); %>\
-    '),
+    // // Gets 'posts' as a parameter from render()
+    // template: _.template('\
+    //     <% posts.each(function(post) { %>\
+    //         <div class="post-container" href="#">\
+    //             <a class="post" data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
+    //                 <%= post.get("post_content") %>\
+    //                 <% if(post.get("user")) { %>\
+    //                     <span data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
+    //                         <br />\
+    //                         @<%= post.get("user").name %>\
+    //                     </span>\
+    //                 <% }; %>\
+    //             </a>\
+    //             <div id="heart-normal">\
+    //                 &hearts;\
+    //             </div>\
+    //         </div>\
+    //     <% }); %>\
+    // '),
 
     // initialize: function () {
     //     this.listenTo(this.collection, 'add', this.render);
@@ -68,7 +68,7 @@ var PostsListView = Backbone.View.extend({
 
     events: {
         'click .post': function(event) {
-            
+
             // If the clicked link is invalid nothing happens
             event.preventDefault();
 
@@ -95,19 +95,6 @@ var PostsListView = Backbone.View.extend({
                     $('#post-viewer-container').html(postDetailView.render().el);
                 }
             });
-        },
-
-
-
-        // TEMPORARY FORMATTING SOLUTION
-        'click .heart': function(event) {
-            event.preventDefault();
-
-            if($(event.target).attr('id') === "heart-normal") {
-                $(event.target).attr('id', 'heart-favorited');
-            } else {
-                $(event.target).attr('id', 'heart-normal');
-            }
         }
     },
 
@@ -120,9 +107,22 @@ var PostsListView = Backbone.View.extend({
 
     // Gets 'collection' from HomeView's render(), which instantiates postListView with 'collection' as a parameter
     render: function() {
-        this.$el.html(this.template({
-            posts: this.collection,
-        }));
+        // this.$el.html(this.template({
+        //     posts: this.collection,
+        //     userLikesArr: this.userLikesArr
+        // }));
+        // return this;
+        var that = this;
+        console.log("d - " + this.userLikesArr);
+        this.collection.forEach(function(post) {
+            var postView = new PostView({
+                model: post,
+                userLikesArr: that.userLikesArr
+            });
+            that.$el.append(postView.render().el);
+        });
+        console.log(this.collection);
+        console.log(this.userLikesArr);
         return this;
     }
 });
@@ -148,37 +148,40 @@ var PostDetailView = Backbone.View.extend({
     },
 
     render: function() {
+        console.log(this.userLikesArr);
         this.$el.html(this.template({ model: this.model }));
         return this;
     }
 });
 
 
-// var PostView = Backbone.View.extend({
-//     el: '<div class="post-viewer"></div>',
-//
-//     template: _.template('\
-//         <div class="title-post-viewer">\
-//             &darr; <%= model.get("post_content") %> &darr;\
-//         </div>\
-//         <div class="post-viewer-details">\
-//             <h4>\
-//                 posted by @<%= model.get("user").name %>\
-//                 <br />\
-//                 <%= model.get("updated_at").substring(0,10) %>\
-//             </h4>\
-//         </div>\
-//     '),
-//
-//     initialize: function() {
-//         this.listenTo(this.model, 'change', this.render);
-//     },
-//
-//     render: function() {
-//         this.$el.html(this.template({ model: this.model }));
-//         return this;
-//     }
-// });
+var PostView = Backbone.View.extend({
+    el: '<div class="post-container"></div>',
+
+    template: _.template('\
+        <a class="post" data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
+            <%= post.get("post_content") %>\
+            <% if(post.get("user")) { %>\
+                <span data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
+                    <br />\
+                    @<%= post.get("user").name %>\
+                </span>\
+            <% }; %>\
+        </a>\
+        <div id="heart-normal">\
+            &hearts;\
+        </div>\
+    '),
+
+    initialize: function() {
+        this.listenTo(this.model, 'change', this.render);
+    },
+
+    render: function() {
+        this.$el.html(this.template({ post: this.model }));
+        return this;
+    }
+});
 
 
 var HomeView = Backbone.View.extend({
@@ -248,16 +251,30 @@ var HomeView = Backbone.View.extend({
 
     render: function() {
 
-        this.insertAllPosts();
         var that = this;
         this.user = new UserModel();
-
         this.user.fetch({
             data: {
                 currentUser: true
             },
             success: function() {
-                that.insertLikes();
+                // Create userLikes variable to hold all likes of current user
+                that.userLikes = that.user.get('likes');
+
+                // Create array of ids for liked posts
+                that.userLikesArr = [];
+                that.userLikes.forEach(function(like) {
+                    that.userLikesArr.push(like.get('id'));
+                });
+
+                // It's important this comes after the other elements so this.userLikes and userLikesArr are populated
+                // when they are called in the methods below
+
+                // Insert user's likes into DOM, and pass along array
+                that.insertLikes({ userLikesArr: that.userLikesArr });
+
+                // Insert all posts into DOM, and pass along array
+                that.insertAllPosts({ userLikesArr: that.userLikesArr });
             }
         });
 
@@ -272,7 +289,8 @@ var HomeView = Backbone.View.extend({
         posts.fetch({
             success: function() {
                 var postsListView = new PostsListView({
-                    collection: posts
+                    collection: posts,
+                    userLikesArr: that.userLikesArr
                 });
                 // Make sure to say postsListView.render().el instead of postsListView.el so that the view actually renders
                 that.$el.find('#all-posts').html(postsListView.render().el);
@@ -284,7 +302,8 @@ var HomeView = Backbone.View.extend({
         // We passed the PostsListView the collection of this.user.get('likes') so that the collection the view renders is
         // the collection of 'likes' that we got from this.user
         var postsListView = new PostsListView({
-            collection: this.user.get('likes')
+            collection: this.userLikes,
+            userLikesArr: this.userLikesArr
         });
         this.$el.find('#main-window').html(postsListView.render().el);
         this.$el.find('#main-title').html('your favorited posts');
@@ -306,8 +325,8 @@ var HomeView = Backbone.View.extend({
 
             $('#error').html("please enter a post");
 
-        // Otherwise, create a new post, save it to the backend, re-render the posts to update the list, then clear
-        // the text field
+            // Otherwise, create a new post, save it to the backend, re-render the posts to update the list, then clear
+            // the text field
         } else {
             var newPost = new PostModel();
             newPost.set({
