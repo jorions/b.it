@@ -11,13 +11,13 @@ $.ajaxSetup({
 
 
 var PostModel = Backbone.Model.extend({
-    urlRoot: '/api/posts/',
+    urlRoot: '/api/posts',
     idAttribute: 'id'
 });
 
 
 var UserModel = Backbone.Model.extend({
-    urlRoot: '/api/users/',
+    urlRoot: '/api/users',
     idAttribute: 'id',
     
     // For /api/users/, when a response with "currentUser=true" is passed into the route, the route returns both a user
