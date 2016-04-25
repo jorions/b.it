@@ -27,11 +27,17 @@
         }
         #all-posts {
             height: 400px;
-            overflow: scroll;
+            overflow-x: hidden;
+            overflow-y: scroll;
         }
         #main-window {
             height: 442px;
-            overflow: scroll;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+
+        .post-list-container {
+            overflow: hidden;
         }
 
         .post-container {
@@ -92,13 +98,16 @@
             font-size: 20px;
             height: 32px;
             text-align: center;
-            overflow: scroll;
+            overflow-x: hidden;
+            overflow-y: scroll;
         }
         .post-viewer-details {
             text-align: center;
             color: #3592b2;
-            overflow: scroll;
+            overflow-x: hidden;
+            overflow-y: scroll;
             height: 78px;
+
         }
 
         #error {
