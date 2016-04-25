@@ -43,6 +43,10 @@ Route::group(['middleware' => 'web'], function () {
             Route::resource('posts', 'PostsController', [
                 'only' => ['store', 'update', 'destroy']
             ]);
+
+            Route::resource('postuser', 'PostUserController', [
+                'only' => ['store', 'destroy']
+            ]);
         });
     });
 });
