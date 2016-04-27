@@ -242,9 +242,11 @@ $(function() {
                     this.userLikesArr = tempArray;
 
                     // Remove it from the database of user Likes
-                    var clickedPost = new PostUserModel();
+                    var clickedPost = new PostUserModel({
+                      id: clickedPostId
+                    });
 
-                    clickedPost.destroy(clickedPostId);
+                    clickedPost.destroy();
                 }
             }
         },
