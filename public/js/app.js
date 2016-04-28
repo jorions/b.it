@@ -5,16 +5,12 @@ $(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-
-
-
-
+    
     var PostModel = Backbone.Model.extend({
         urlRoot: '/api/posts',
         idAttribute: 'id'
     });
-
-
+    
     var UserModel = Backbone.Model.extend({
         urlRoot: '/api/users',
         idAttribute: 'id',
@@ -40,35 +36,8 @@ $(function() {
         model: PostModel
     });
 
-
-
-
     var PostsListView = Backbone.View.extend({
         el: '<div class="post-list-container"></div>',
-
-        // // Gets 'posts' as a parameter from render()
-        // template: _.template('\
-        //     <% posts.each(function(post) { %>\
-        //         <div class="post-container" href="#">\
-        //             <a class="post" data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
-        //                 <%= post.get("post_content") %>\
-        //                 <% if(post.get("user")) { %>\
-        //                     <span data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
-        //                         <br />\
-        //                         @<%= post.get("user").name %>\
-        //                     </span>\
-        //                 <% }; %>\
-        //             </a>\
-        //             <div id="heart-normal">\
-        //                 &hearts;\
-        //             </div>\
-        //         </div>\
-        //     <% }); %>\
-        // '),
-
-        // initialize: function () {
-        //     this.listenTo(this.collection, 'add', this.render);
-        // },
 
         events: {
             'click .post': function(event) {
@@ -110,19 +79,10 @@ $(function() {
         initialize: function(options) {
             this.userLikesArr = options.userLikesArr;
         },
-        // Gets 'collection' from HomeView's render(), which instantiates postListView with 'collection' as a parameter
-        // This method automatically runs whenever its class is instantiated
-        // initialize: function() {
-        //     this.listenTo(this.collection, 'update', this.render);
-        // },
 
         // Gets 'collection' from HomeView's render(), which instantiates postListView with 'collection' as a parameter
         render: function() {
-            // this.$el.html(this.template({
-            //     posts: this.collection,
-            //     userLikesArr: this.userLikesArr
-            // }));
-            // return this;
+
             var that = this;
 
             this.collection.forEach(function(post) {
@@ -207,6 +167,9 @@ $(function() {
                     // Add it to the window of user likes if that is the window that is currently open
                     if($('#main-title').text() === 'your favorited posts') {
                         var that = this;
+
+                        // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger
+                        // the UserController's index() to return the current user with all of their likes
                         var user = new UserModel();
                         user.fetch({
                             data: {
@@ -245,19 +208,22 @@ $(function() {
                     var clickedPost = new PostUserModel({
                         id: clickedPostId
                     });
-
                     clickedPost.destroy();
 
-                    // Remove it from the window of user likes if that is the window that is currently open
-                    if($('#main-title').text() === 'your favorited posts') {
-                        var that = this;
-                        var user = new UserModel();
-                        user.fetch({
-                            data: {
-                                currentUser: true
-                            },
-                            success: function () {
+                    // Prepare to re-render the necessary parts of the page by preparing a new UserModel
+                    // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger
+                    // the UserController's index() to return the current user with all of their likes
+                    var user = new UserModel();
+                    var that = this;
 
+                    user.fetch({
+                        data: {
+                            currentUser: true
+                        },
+                        success: function () {
+
+                            // Remove unliked post from the window of user likes if that is the window that is currently open
+                            if($('#main-title').text() === 'your favorited posts') {
                                 // Create userLikes variable to hold all likes of current user
                                 var userLikes = user.get('likes');
 
@@ -268,8 +234,21 @@ $(function() {
 
                                 $('#main-window').html(postsListView.render().el);
                             }
-                        });
-                    }
+
+                            // Re-render all posts so that they reflect the "unlike"
+                            var posts = new PostsCollection();
+                            posts.fetch({
+                                success: function() {
+                                    var postsListView = new PostsListView({
+                                        collection: posts,
+                                        userLikesArr: that.userLikesArr
+                                    });
+                                    // Make sure to say postsListView.render().el instead of postsListView.el so that the view actually renders
+                                    $('#all-posts').html(postsListView.render().el);
+                                }
+                            });
+                        }
+                    });
                 }
             }
         },
@@ -336,25 +315,6 @@ $(function() {
             </div>\
         ',
 
-        // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger the UserController's
-        // index() to return the current user with all of their likes
-        // initialize: function() {
-        //     this.user = new UserModel();
-        //
-        //     this.user.fetch({
-        //         data: {
-        //             currentUser: true
-        //         }
-        //     });
-        //
-        //     // Listen to syncs on this.user. fetch() is asynchronous, so it won't run when it is first called, it will run
-        //     // after everything else that isn't asynchronous has run. So when we fetch above it is actually just making
-        //     // this.user into an empty shell. So if we were to just try to render the user's likes in the render() below, it
-        //     // wouldn't work. Instead we need to have a function that adds the likes to the el that runs whenever this.user
-        //     // syncs, and this.user syncs once it successfully runs fetch()
-        //     this.listenTo(this.user, 'sync', this.insertLikes);
-        // },
-
         events: {
             "click #submit": "createPost",
 
@@ -377,6 +337,8 @@ $(function() {
 
             var that = this;
 
+            // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger
+            // the UserController's index() to return the current user with all of their likes
             var user = new UserModel();
             user.fetch({
                 data: {
@@ -393,7 +355,6 @@ $(function() {
                     });
 
                     var posts = new PostsCollection();
-                    console.log("insertallposts - " + that.userLikesArr);
 
                     posts.fetch({
                         success: function() {
@@ -413,6 +374,8 @@ $(function() {
 
             var that = this;
 
+            // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger
+            // the UserController's index() to return the current user with all of their likes
             var user = new UserModel();
             user.fetch({
                 data: {
