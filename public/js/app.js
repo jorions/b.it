@@ -417,8 +417,8 @@ $(function() {
 
                 $('#error').html("please enter a post");
 
-                // Otherwise, create a new post, save it to the backend, re-render the posts to update the list, then clear
-                // the text field
+            // Otherwise, create a new post, save it to the backend, re-render the posts to update the list, then clear
+            // the text field
             } else {
                 var newPost = new PostModel();
                 newPost.set({
@@ -432,21 +432,11 @@ $(function() {
                 $('#new-post').val("");
 
                 $('#error').html("");
-
-
             }
         }
     });
 
-
-
+    
     var homeView = new HomeView();
     $('#content').html(homeView.render().el);
-
-
-    // QUESTIONS
-    // WHY ARE MY REQUESTS SHOWING UP TWICE?
-    // HOW TO GET NAMES TO SHOW UP NEXT TO EACH POST?
-    // IS THERE A BETTER WAY TO ADD A NEWLY CREATED POST TO THE LIST BESIDES CALLING THIS.INSERTALLPOSTS()? LIKE APPENDING
-    //   ONLY THE NEW POST ( this.$el.find('#all-posts').append(newPost) )
 });
