@@ -242,9 +242,34 @@ $(function() {
                     this.userLikesArr = tempArray;
 
                     // Remove it from the database of user Likes
-                    var clickedPost = new PostUserModel();
+                    var clickedPost = new PostUserModel({
+                        id: clickedPostId
+                    });
 
-                    clickedPost.destroy(clickedPostId);
+                    clickedPost.destroy();
+
+                    // Remove it from the window of user likes if that is the window that is currently open
+                    if($('#main-title').text() === 'your favorited posts') {
+                        var that = this;
+                        var user = new UserModel();
+                        user.fetch({
+                            data: {
+                                currentUser: true
+                            },
+                            success: function () {
+
+                                // Create userLikes variable to hold all likes of current user
+                                var userLikes = user.get('likes');
+
+                                var postsListView = new PostsListView({
+                                    collection: userLikes,
+                                    userLikesArr: that.userLikesArr
+                                });
+
+                                $('#main-window').html(postsListView.render().el);
+                            }
+                        });
+                    }
                 }
             }
         },
