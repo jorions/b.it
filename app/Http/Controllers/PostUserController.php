@@ -46,7 +46,7 @@ class PostUserController extends Controller
         // Get user like
         $like = $user->likes()->where(['post_user.user_id' => $user->id, 'post_user.post_id' => $id])->get();
 
-        // Check if the like is valid
+        // Check if the like is valid. If it is not, redirect to a 403 page
         if($like != null) {
 
             // Raw database command to delete the entry
