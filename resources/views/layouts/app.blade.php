@@ -134,8 +134,10 @@
             text-align: center;
             border-top-right-radius: 0;
             border-top-left-radius: 0;
-            border-bottom-left-radius: 9px;
-            border-bottom-right-radius: 9px;
+
+            /*Removed for formatting consistency*/
+            /*border-bottom-left-radius: 9px;*/
+            /*border-bottom-right-radius: 9px;*/
         }
         #submit:hover {
             border: 1px solid gray;
@@ -148,7 +150,11 @@
         #content-container {
             margin-bottom: 40px;
             border: 1px solid darkgray;
-            border-radius: 10px;
+
+            /*Removed for formatting consistency*/
+            /*border-radius: 10px;*/
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
         }
         #post-viewer-container {
             height: 110px;
