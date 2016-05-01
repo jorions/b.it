@@ -17,9 +17,10 @@ class UsersController extends Controller
     {
         // If a request is not passed into the route with "currentUser=true", then just show all users. Otherwise return
         // only the current user with all of their likes
-        // first() is used because where() returns an array, and in the array is just the 1 user, so this pulls out the
-        // first user as just an object
         if ($request->currentUser) {
+
+            // first() is used because where() returns an array, and in the array is just the 1 user, so this pulls out the
+            // first user as just an object
             return App\User::where('id', \Auth::user()->id)->with('likes.user')->first();
         }
 
@@ -35,6 +36,7 @@ class UsersController extends Controller
      */
     public function show($id)
     {
+        // Return a user of a given $id with all of their posts attached
         return App\User::with('posts')->find($id);
     }
 
@@ -48,15 +50,17 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // Create a user based on the given $id
         $user = App\User::find($id);
 
+        // Validate that the given $id matches the current user's id. If it is invalid send the user to a 403 page
         if ($user->id == \Auth::user()->id) {
+
+            // Update the user's profile accordingly if there is a match
             $user->name = $request->name;
             $user->email = $request->email;
 
-            // ?? IS THERE A DIFFERENT WAY TO STORE THIS GIVEN THAT WE SHOULD HASH THE DATA??
-            $user->password = $request->password;
-
+            // Save to the database
             $user->save();
 
             return $user;
@@ -74,10 +78,13 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
+        // Create a user based on the given $id
         $user = App\User::find($id);
 
+        // Validate that the given $id matches the current user's id. If it is invalid send the user to a 403 page
         if ($user->id == \Auth::user()->id) {
 
+            // Remove the user from the database
             $user->delete();
 
             return $user;
