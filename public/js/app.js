@@ -1,16 +1,20 @@
 $(function() {
 
+
+    // Insert the csrf token for security verification
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    
+
+    // The model to hold posts
     var PostModel = Backbone.Model.extend({
         urlRoot: '/api/posts',
         idAttribute: 'id'
     });
-    
+
+    // The model to hold users (used for getting likes and for seeing all posts by a given users)
     var UserModel = Backbone.Model.extend({
         urlRoot: '/api/users',
         idAttribute: 'id',
@@ -26,48 +30,83 @@ $(function() {
         }
     });
 
+    // The model to hold user's likes
     var PostUserModel = Backbone.Model.extend({
         urlRoot: '/api/postuser',
         idAttribute: 'id'
     });
 
+    // The collection for holding PostModels
     var PostsCollection = Backbone.Collection.extend({
         url: '/api/posts',
         model: PostModel
     });
 
+    // The view for holding a PostCollection
     var PostsListView = Backbone.View.extend({
+
+        // The el is the container for the view
         el: '<div class="post-list-container"></div>',
 
+        // Listen to the following events
         events: {
+
+            // If a .post is clicked then show all posts by that post's user
             'click .post': function(event) {
 
                 // If the clicked link is invalid nothing happens
                 event.preventDefault();
 
+                // Set that=this so that we can use the 'this' scope inside of the success call below
                 var that = this;
 
+                // Create a UserModel from the data-user-id attribute of the clicked post
                 var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
+
+                // fetch() is asynchronous, so add a success callback to indicate what should not be run until the fetch
+                // successfully happens
                 clickedUser.fetch({
+
+                    // Populate the #main-window with all of the clicked user's posts, add a button to view your favorites,
+                    // and adjust the size of the elements so everything stays aligned along the bottom edge of the app
                     success: function() {
+
+                        // Create PostsCollection of clickedUser's posts
                         var posts = new PostsCollection(clickedUser.get('posts'));
                         posts.fetch();
+
+                        // Create PostListView out of the new PostsCollection, and pass it the array of userLikes so the
+                        // view knows which posts to put a red heart next to
                         var usersPostsListView = new PostsListView({
                             collection: posts,
                             userLikesArr: that.userLikesArr
                         });
+
+                        // Populate #main-window with the new PostsListView and adjust the size as needed
                         $('#main-window').html(usersPostsListView.render().el);
                         $('#main-window').height("410px");
+
+                        // Create title for #main-window
                         var mainTitle = "posts by @" + clickedUser.get('name');
                         $('#main-title').html(mainTitle);
+
+                        // Add favorites button
                         $('#favorites-button').html("&rarr; click to see your favorites &larr;");
+
+                        // Reset error message
                         $('#error').html("");
 
                     }
                 });
 
+                // Create a new PostModel to populate the #post-viewer-container with details about the post that was clicked
                 var clickedPost = new PostModel({ id: $(event.target).data('id') });
+
+                // fetch() data about the clickedPost
                 clickedPost.fetch({
+
+                    // Upon success, create a new PostDetailView populate with the clickedPost, then render that view and
+                    // use it's el to populate the #post-viewer-container
                     success: function() {
                         var postDetailView = new PostDetailView({ model: clickedPost });
                         $('#post-viewer-container').html(postDetailView.render().el);
@@ -76,6 +115,9 @@ $(function() {
             }
         },
 
+        // initialize runs when the view is instantiated. This method can use 'options' which are anything but models
+        // and collections that are passed into the view. In this case, we always pass this view an array of userLikes
+        // which are used in the render() method below to identify which posts should have a red heart next to them
         initialize: function(options) {
             this.userLikesArr = options.userLikesArr;
         },
@@ -83,22 +125,34 @@ $(function() {
         // Gets 'collection' from HomeView's render(), which instantiates postListView with 'collection' as a parameter
         render: function() {
 
+            // Set that=this so that we can use the 'this' scope inside of the forEach below
             var that = this;
 
+            // Iterate through this view's collection, calling each iterated item a post
             this.collection.forEach(function(post) {
+
+                // Turn each iterated post into a postView that has the array of userLikes
                 var postView = new PostView({
                     model: post,
                     userLikesArr: that.userLikesArr
                 });
+
+                // Append the rendered el of the postView to this view's el
                 that.$el.append(postView.render().el);
             });
+
+            // Return 'this' so that when we call this view's render() elsewhere we can then access 'this' view's el
             return this;
         }
     });
 
+    // The view for populating the #post-viewer-container
     var PostDetailView = Backbone.View.extend({
+
+        // The el is the container for the view
         el: '<div class="post-viewer"></div>',
 
+        // The underscore template that will populate the el
         template: _.template('\
             <div class="title-post-viewer">\
                 &darr; <%= model.get("post_content") %> &darr;\
@@ -112,20 +166,33 @@ $(function() {
             </div>\
         '),
 
+        // Upon instantiation of this view the initialize is called
         initialize: function() {
+
+            // Whenever the model for this view is changed, re-render this view
             this.listenTo(this.model, 'change', this.render);
         },
 
+        // This populates the el with the template
         render: function() {
+
+            // Use the model that was passed into this view to populate the template
             this.$el.html(this.template({ model: this.model }));
+
+            // Return 'this' so that when we call this view's render() elsewhere we can then access 'this' view's el
             return this;
         }
     });
 
-
+    // The view for populating a single post
     var PostView = Backbone.View.extend({
+
+        // The el is the container for the view
         el: '<div class="post-container"></div>',
 
+        // The underscore template that will populate the el
+        // Note that the post's user_id is passed in as the attribute data-user-id
+        // Note that there is a heart div with a variable id
         template: _.template('\
             <a class="post" data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
                 <%= post.get("post_content") %>\
@@ -166,6 +233,8 @@ $(function() {
 
                     // Add it to the window of user likes if that is the window that is currently open
                     if($('#main-title').text() === 'your favorited posts') {
+
+                        // Set that=this so that we can use the 'this' scope inside of the success callback below
                         var that = this;
 
                         // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger
@@ -180,11 +249,14 @@ $(function() {
                                 // Create userLikes variable to hold all likes of current user
                                 var userLikes = user.get('likes');
 
+                                // Create a PostListView with the collection being userLikes, and pass it the array of
+                                // userLikes so the view knows which posts to put a red heart next to
                                 var postsListView = new PostsListView({
                                     collection: userLikes,
                                     userLikesArr: that.userLikesArr
                                 });
 
+                                // Populate the #main-window with the new postsListView
                                 $('#main-window').html(postsListView.render().el);
                             }
                         });
@@ -192,10 +264,10 @@ $(function() {
 
                 } else {
 
-                    // Format it to be 'normal'
+                    // Format the heart to be 'normal'
                     $(event.target).attr('id', 'heart-normal');
 
-                    // Remove it from the user Likes array
+                    // Remove the id of the clicked heart from the userLikes array
                     var tempArray = [];
                     this.userLikesArr.forEach(function(likedId) {
                         if(likedId != clickedPostId) {
@@ -211,11 +283,14 @@ $(function() {
                     clickedPost.destroy();
 
                     // Prepare to re-render the necessary parts of the page by preparing a new UserModel
-                    // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger
-                    // the UserController's index() to return the current user with all of their likes
+                    // Initialize a UserModel
                     var user = new UserModel();
+
+                    // Set that=this so that we can use the 'this' scope inside of the success callback below
                     var that = this;
 
+                    // fetch() the new UserModel with the response "currentUser=true", which will trigger the UserController's
+                    // index() to return the current user with all of their likes
                     user.fetch({
                         data: {
                             currentUser: true
@@ -224,14 +299,18 @@ $(function() {
 
                             // Remove unliked post from the window of user likes if that is the window that is currently open
                             if($('#main-title').text() === 'your favorited posts') {
+
                                 // Create userLikes variable to hold all likes of current user
                                 var userLikes = user.get('likes');
 
+                                // Create a PostListView with the collection being userLikes, and pass it the array of
+                                // userLikes so the view knows which posts to put a red heart next to
                                 var postsListView = new PostsListView({
                                     collection: userLikes,
                                     userLikesArr: that.userLikesArr
                                 });
 
+                                // Populate the #main-window with the new postsListView
                                 $('#main-window').html(postsListView.render().el);
                             }
 
@@ -270,6 +349,8 @@ $(function() {
                 post: this.model,
                 heartType: heartType
             }));
+
+            // Return 'this' so that when we call this view's render() elsewhere we can then access 'this' view's el
             return this;
         }
     });
@@ -290,7 +371,7 @@ $(function() {
                             <div class="twelve columns" id="content-container">\
                                 <div class="title">create a post</div>\
                                 <div id="post-form">\
-                                    <input type="text" id="new-post" name="new-post" placeholder="enter post" />\
+                                    <input type="text" id="new-post" name="new-post" placeholder="enter post" maxlength="50"/>\
                                     <div id="error"></div>\
                                     <div id="submit">submit</div>\
                                 </div>\
@@ -329,7 +410,7 @@ $(function() {
             // Insert all posts into DOM, and pass along array
             this.insertAllPosts();
 
-
+            // Return 'this' so that when we call this view's render() elsewhere we can then access 'this' view's el
             return this;
         },
 
@@ -436,7 +517,7 @@ $(function() {
         }
     });
 
-    
+
     var homeView = new HomeView();
     $('#content').html(homeView.render().el);
 });
