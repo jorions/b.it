@@ -14,8 +14,8 @@
 // For creating users
 $factory->define(App\User::class, function (Faker\Generator $faker) {
     return [
-        'name' => $faker->name,
-        'email' => $faker->safeEmail,
+        'name' => $faker->unique()->userName,
+        'email' => $faker->unique()->safeEmail,
         'password' => bcrypt(str_random(10)),
         'remember_token' => str_random(10),
     ];
@@ -25,6 +25,6 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
 // For creating posts
 $factory->define(App\Post::class, function (Faker\Generator $faker) {
     return [
-        'post_content' => $faker->sentence,
+        'post_content' => $faker->text($maxNbChars = 50),
     ] ;
 });
