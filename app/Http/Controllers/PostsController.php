@@ -15,7 +15,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        //return App\Post::all();
+        // Return all posts with their user attached, sorted in descending order of post date
         return App\Post::with('user')->orderBy('updated_at', 'desc')->get();
     }
 
@@ -30,10 +30,11 @@ class PostsController extends Controller
     {
         $post = new App\Post;
 
-        // Assign the post the current user's id
+        // Assign the post the current user's id and the content from the $request
         $post->user_id = \Auth::user()->id;
         $post->post_content = $request->post_content;
 
+        // Save the $post to the database
         $post->save();
 
         return $post;
@@ -48,6 +49,7 @@ class PostsController extends Controller
      */
     public function show($id)
     {
+        // Return the post of a given $id with its user and that user's posts attached
         return App\Post::with('user.posts')->find($id);
     }
 
@@ -61,9 +63,11 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        
+        // Get the post with the given $id
         $post = App\Post::find($id);
 
-        // If current post's id matches current user's id, allow update
+        // If current post's id matches current user's id, allow update, otherwise redirect to a 403 page
         if($post->user_id == \Auth::user()->id)
         {
             $post->post_content = $request->post_content;
@@ -83,9 +87,10 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
+        // Get the post with the given $id
         $post = App\Post::find($id);
 
-        // If current post's id matches current user's id. allow delete
+        // If current post's user_id matches current user's id, allow delete. Otherwise redirect to a 403 page
         if($post->user_id == \Auth::user()->id)
         {
             $post->delete();
