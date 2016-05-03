@@ -117,7 +117,7 @@ $(function() {
 
         // initialize runs when the view is instantiated. This method can use 'options' which are anything but models
         // and collections that are passed into the view. In this case, we always pass this view an array of userLikes
-        // which are used in the render() method below to identify which posts should have a red heart next to them
+        // so that we can continue passing these likes to other views that we instantiate through this view
         initialize: function(options) {
             this.userLikesArr = options.userLikesArr;
         },
@@ -192,7 +192,8 @@ $(function() {
 
         // The underscore template that will populate the el
         // Note that the post's user_id is passed in as the attribute data-user-id
-        // Note that there is a heart div with a variable id
+        // Note that there is a heart div with a variable id. This id will dictate the heart's formatting (red or gray)
+        // and by default = 'heart-normal'
         template: _.template('\
             <a class="post" data-id="<%= post.id %>" data-user-id="<%= post.get("user_id") %>">\
                 <%= post.get("post_content") %>\
@@ -210,10 +211,11 @@ $(function() {
 
         events: {
 
-            // When a heart is clicked, format accordingly and add/remove it from arrays and tables
+            // When a heart is clicked, format accordingly and add/remove it from array and views
             'click .heart': function(event) {
                 event.preventDefault();
 
+                // Get the post id of the clicked heard
                 var clickedPostId = $(event.target).data('id');
 
                 // If the clicked heart is 'normal' it is not favorited, so...
@@ -249,7 +251,7 @@ $(function() {
                                 // Create userLikes variable to hold all likes of current user
                                 var userLikes = user.get('likes');
 
-                                // Create a PostListView with the collection being userLikes, and pass it the array of
+                                // Create a PostListView with the collection userLikes, and pass it the array of
                                 // userLikes so the view knows which posts to put a red heart next to
                                 var postsListView = new PostsListView({
                                     collection: userLikes,
@@ -303,7 +305,7 @@ $(function() {
                                 // Create userLikes variable to hold all likes of current user
                                 var userLikes = user.get('likes');
 
-                                // Create a PostListView with the collection being userLikes, and pass it the array of
+                                // Create a PostListView with the collection userLikes, and pass it the array of
                                 // userLikes so the view knows which posts to put a red heart next to
                                 var postsListView = new PostsListView({
                                     collection: userLikes,
@@ -317,12 +319,16 @@ $(function() {
                             // Re-render all posts so that they reflect the "unlike"
                             var posts = new PostsCollection();
                             posts.fetch({
+
+                                // Upon a successful call, create a new view of the pass it the updated array of userLikes
                                 success: function() {
                                     var postsListView = new PostsListView({
                                         collection: posts,
                                         userLikesArr: that.userLikesArr
                                     });
-                                    // Make sure to say postsListView.render().el instead of postsListView.el so that the view actually renders
+
+                                    // Make sure to say postsListView.render().el instead of postsListView.el so that the
+                                    // view actually renders
                                     $('#all-posts').html(postsListView.render().el);
                                 }
                             });
@@ -332,31 +338,54 @@ $(function() {
             }
         },
 
+        // initialize runs when the view is instantiated. This method can use 'options' which are anything but models
+        // and collections that are passed into the view. In this case, we always pass this view an array of userLikes
+        // which are used in the render() method below to identify which posts should have a red heart next to them
         initialize: function(options) {
+
+            // Listen for changes to the view's model. Upon a change, re-render
             this.listenTo(this.model, 'change', this.render);
+
+            // Create an array of UserLikes based off of the array passed through the options
             this.userLikesArr = options.userLikesArr;
         },
 
+        // Populate this view's el with the template
         render: function() {
+
+            // By default the heart type is 'normal'
             var heartType = "normal";
+
+            // Set that=this so that we can use the 'this' scope inside of the forEach below
             var that = this;
+
+            // Iterate over the array of userLikes
             this.userLikesArr.forEach(function(likedId) {
+
+                // If any of the userLikes' ids (which are post ids) matches the current model's (post's) id, set the
+                // heartType to 'favorited'
                 if(likedId === that.model.id) {
                     heartType = "favorited";
                 }
             });
+
+            // Populate this view's el with the template, and pass the template the current model (post) as well as the
+            // heartType, which is used as a dynamic value
             this.$el.html(this.template({
                 post: this.model,
                 heartType: heartType
             }));
 
-            // Return 'this' so that when we call this view's render() elsewhere we can then access 'this' view's el
+            // Return 'this' so that when we call this view's render() elsewhere we can then access 'this' view's el with
+            // statements such as postView.render().el
             return this;
         }
     });
 
-
+    // The main app
     var HomeView = Backbone.View.extend({
+
+        // The visual structure of the app
         el: '\
             <div class="container">\
                 <div class="row">\
@@ -396,9 +425,13 @@ $(function() {
             </div>\
         ',
 
+        // Continuously listen for these events
         events: {
+
+            // If the #submit button is pressed then create a poast
             "click #submit": "createPost",
 
+            // If the #favorites-button is pressed then insert the view of the user's likes
             "click #favorites-button": "insertLikes"
         },
 
@@ -414,8 +447,10 @@ $(function() {
             return this;
         },
 
+        // Insert all posts into the DOM, and pass along array
         insertAllPosts: function() {
 
+            // Set that=this so that we can use the 'this' scope in the success callback below
             var that = this;
 
             // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger
@@ -426,6 +461,7 @@ $(function() {
                     currentUser: true
                 },
                 success: function() {
+
                     // Create userLikes variable to hold all likes of current user
                     that.userLikes = user.get('likes');
 
@@ -435,15 +471,21 @@ $(function() {
                         that.userLikesArr.push(like.get('id'));
                     });
 
+                    // Create a new PostsCollection to hold all of the posts
                     var posts = new PostsCollection();
 
+                    // Fetch all of these posts
                     posts.fetch({
+
+                        // Upon success, populate a new view with the now-fetched posts as well as the array of userLikes
                         success: function() {
                             var postsListView = new PostsListView({
                                 collection: posts,
                                 userLikesArr: that.userLikesArr
                             });
-                            // Make sure to say postsListView.render().el instead of postsListView.el so that the view actually renders
+
+                            // Make sure to say postsListView.render().el instead of postsListView.el so that the view
+                            // actually renders
                             that.$el.find('#all-posts').html(postsListView.render().el);
                         }
                     });
@@ -451,8 +493,10 @@ $(function() {
             });
         },
 
+        // Insert user's likes into DOM, and pass along array
         insertLikes: function() {
 
+            // Set that=this so that we can use the 'this' scope in the success callback below
             var that = this;
 
             // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger
@@ -463,6 +507,7 @@ $(function() {
                     currentUser: true
                 },
                 success: function() {
+
                     // Create userLikes variable to hold all likes of current user
                     that.userLikes = user.get('likes');
 
@@ -472,52 +517,64 @@ $(function() {
                         that.userLikesArr.push(like.get('id'));
                     });
 
+                    // Now that the user's likes have been successfully fetched, populate a new view with the now-fetched
+                    // posts as well as the array of userLikes
                     var postsListView = new PostsListView({
                         collection: that.userLikes,
                         userLikesArr: that.userLikesArr
                     });
+
+                    // Populate the #main-window with the userLikes
                     that.$el.find('#main-window').html(postsListView.render().el);
+
+                    // Set the title to reflect that the favorited posts are being shown
                     that.$el.find('#main-title').html('your favorited posts');
+
+                    // Set the #main-window to the proper height to compensate for the lack of a #favorites-button
                     that.$el.find('#main-window').height("442px");
                     that.$el.find('#favorites-button').html("");
+
+                    // Reset error message
                     that.$el.find('#error').html("");
                 }
             });
 
         },
 
+        // Provide the functionality to add posts to the database
         createPost: function() {
-
-            //var postContent = $('#new-post').value;
 
             // Get the value of the text input
             var postContent = document.getElementsByName('new-post')[0].value;
 
-            // If the input is empty, tell the user with an alert
+            // If the input is empty, populate the #error div with a message
             if(postContent === "") {
 
                 $('#error').html("please enter a post");
 
-            // Otherwise, create a new post, save it to the backend, re-render the posts to update the list, then clear
-            // the text field
+            // Otherwise...
             } else {
+
+                // Create a new post and save it to the backend
                 var newPost = new PostModel();
                 newPost.set({
                     post_content: postContent
                 });
-
                 newPost.save();
 
+                // Re-render the posts to update the list
                 this.insertAllPosts();
 
+                // Clear the text field and error div
                 $('#new-post').val("");
-
                 $('#error').html("");
             }
         }
     });
 
-
+    // Instantiate a new HomeView
     var homeView = new HomeView();
+
+    // Populate the main #content div of the page with the new homeView's rendered el
     $('#content').html(homeView.render().el);
 });
