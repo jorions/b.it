@@ -125,7 +125,10 @@ $(function() {
 
                     // Create PostsCollection of clickedUser's posts
                     var posts = new PostsCollection(clickedUser.get('posts'));
-                    posts.fetch();
+
+                    // Uncomment this line to add user name to each post when viewing all posts by a user
+                    // NOTE: There is a lag between rendering the posts and rendering the user names
+                    //posts.fetch();
 
                     // Create PostListView out of the new PostsCollection, and pass it the array of userLikes so the
                     // view knows which posts to put a red heart next to
@@ -297,9 +300,6 @@ $(function() {
                                 postsListView.getClickedUserPosts(clickedUser);
                             }
                         });
-
-                        // Populate the #main-window with all posts from the clickedUser
-                        this.getClickedUserPosts(clickedUser);
                     }
 
                 // Otherwise if the heart is not 'normal' it is already favorited, so...
@@ -378,9 +378,6 @@ $(function() {
                                         postsListView.getClickedUserPosts(clickedUser);
                                     }
                                 });
-
-                                // Populate the #main-window with all posts from the clickedUser
-                                this.getClickedUserPosts(clickedUser);
                             }
 
                             // Re-render all posts so that they reflect the "unlike"
