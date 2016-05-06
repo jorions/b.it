@@ -272,16 +272,16 @@ $(function() {
                 // Set that=this so that we can use the 'this' scope inside of the success callback below
                 var that = this;
 
-                // fetch() the new UserModel with the response "currentUser=true", which will trigger the UserController's
-                // index() to return the current user with all of their likes
-                user.fetch({
-                    data: {
-                        currentUser: true
-                    },
-                    success: function () {
+                // Remove unliked post from the window of user likes if that is the window that is currently open
+                if($('#main-title').text() === 'your favorited posts') {
 
-                        // Remove unliked post from the window of user likes if that is the window that is currently open
-                        if($('#main-title').text() === 'your favorited posts') {
+                    // fetch() the new UserModel with the response "currentUser=true", which will trigger the UserController's
+                    // index() to return the current user with all of their likes
+                    user.fetch({
+                        data: {
+                            currentUser: true
+                        },
+                        success: function () {
 
                             // Create userLikes variable to hold all likes of current user
                             var userLikes = user.get('likes');
@@ -295,37 +295,37 @@ $(function() {
 
                             // Populate the #main-window with the new postsListView
                             $('#main-window').html(postsListView.render().el);
-
-                        // Otherwise, if the #main-title is not 'your favorited posts' then that means we are viewing a specific
-                        // user's posts, so re-render view accordingly
-                        } else {
-
-                            // Create a UserModel from the data-user-id attribute of the clicked post
-                            var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
-
-                            // Fetch the clickedUser
-                            clickedUser.fetch({
-
-                                // Upon success, get the user's posts
-                                success: function() {
-                                    var userPosts = clickedUser.get('posts');
-
-                                    // Then create a view out of those posts
-                                    var postsListView = new PostsListView({
-                                        collection: userPosts,
-                                        userLikesArr: that.userLikesArr
-                                    });
-
-                                    // And use the view's method to render the clickedUser's posts
-                                    postsListView.getClickedUserPosts(clickedUser);
-                                }
-                            });
                         }
+                    });
 
-                        // Re-render homeViews all-posts window
-                        homeView.insertAllPosts();
-                    }
-                });
+                // Otherwise, if the #main-title is not 'your favorited posts' then that means we are viewing a specific
+                // user's posts, so re-render view accordingly
+                } else {
+
+                    // Create a UserModel from the data-user-id attribute of the clicked post
+                    var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
+
+                    // Fetch the clickedUser
+                    clickedUser.fetch({
+
+                        // Upon success, get the user's posts
+                        success: function() {
+                            var userPosts = clickedUser.get('posts');
+
+                            // Then create a view out of those posts
+                            var postsListView = new PostsListView({
+                                collection: userPosts,
+                                userLikesArr: that.userLikesArr
+                            });
+
+                            // And use the view's method to render the clickedUser's posts
+                            postsListView.getClickedUserPosts(clickedUser);
+                        }
+                    });
+                }
+
+                // Re-render homeViews all-posts window
+                homeView.insertAllPosts();
             }
         },
 
