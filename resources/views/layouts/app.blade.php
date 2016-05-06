@@ -98,14 +98,12 @@
             font-size: 20px;
             height: 32px;
             text-align: center;
-            overflow-x: hidden;
-            overflow-y: scroll;
+            overflow: hidden;
         }
         .post-viewer-details {
             text-align: center;
             color: #3592b2;
-            overflow-x: hidden;
-            overflow-y: scroll;
+            overflow: hidden;
             height: 78px;
 
         }
