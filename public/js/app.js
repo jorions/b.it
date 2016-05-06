@@ -176,13 +176,6 @@ $(function() {
             </div>\
         '),
 
-        // Upon instantiation of this view the initialize is called
-        initialize: function() {
-
-            // Whenever the model for this view is changed, re-render this view
-            //this.listenTo(this.model, 'change', this.render);
-        },
-
         // This populates the el with the template
         render: function() {
 
@@ -243,6 +236,9 @@ $(function() {
                     });
                     clickedPost.save();
 
+
+                    console.log('1. Add like to DB');
+
                 // Otherwise if the heart is not 'normal' it is already favorited, so...
                 } else {
 
@@ -263,6 +259,8 @@ $(function() {
                         id: clickedPostId
                     });
                     clickedPost.destroy();
+
+                    console.log('1. Remove like from DB');
                 }
 
                 // Prepare to re-render the necessary parts of the page by preparing a new UserModel
@@ -283,6 +281,8 @@ $(function() {
                         },
                         success: function () {
 
+                            console.log('2. Get logged in user');
+
                             // Create userLikes variable to hold all likes of current user
                             var userLikes = user.get('likes');
 
@@ -295,6 +295,12 @@ $(function() {
 
                             // Populate the #main-window with the new postsListView
                             $('#main-window').html(postsListView.render().el);
+
+                            console.log('3. Render new view of favorites')
+
+                            // Re-render homeViews all-posts window
+                            homeView.insertAllPosts();
+                            console.log('4. Render all posts');
                         }
                     });
 
@@ -310,6 +316,9 @@ $(function() {
 
                         // Upon success, get the user's posts
                         success: function() {
+
+                            console.log('2. Get clicked user');
+
                             var userPosts = clickedUser.get('posts');
 
                             // Then create a view out of those posts
@@ -320,12 +329,15 @@ $(function() {
 
                             // And use the view's method to render the clickedUser's posts
                             postsListView.getClickedUserPosts(clickedUser);
+
+                            console.log('3. Render new view of clicked users posts');
+
+                            // Re-render homeViews all-posts window
+                            homeView.insertAllPosts();
+                            console.log('4. Render all posts');
                         }
                     });
                 }
-
-                // Re-render homeViews all-posts window
-                homeView.insertAllPosts();
             }
         },
 
