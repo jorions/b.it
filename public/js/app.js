@@ -399,6 +399,9 @@ $(function() {
                         }
                     });
                 }
+
+                // Re-render all posts to be safe
+                homeView.insertAllPosts();
             }
         },
 
@@ -500,9 +503,7 @@ $(function() {
             "click #submit": "createPost",
 
             // If the #favorites-button is pressed then insert the view of the user's likes
-            "click #favorites-button": "insertLikes",
-
-            "click .heart": "insertAllPosts"
+            "click #favorites-button": "insertLikes"
         },
 
         render: function() {
