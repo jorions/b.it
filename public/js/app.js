@@ -270,8 +270,8 @@ $(function() {
                             }
                         });
 
-                    // Otherwise, if the id of the newly-liked/unliked post is part of the array of currently-rendered
-                    // list of the clicked user's posts, re-render the view
+                    // Otherwise, if the #main-title is not 'your favorited posts' then that means we are viewing a specific
+                    // user's posts, so re-render view accordingly
                     } else {
 
                         // Set that=this so that we can use the 'this' scope inside of the success callback below
@@ -280,16 +280,20 @@ $(function() {
                         // Create a UserModel from the data-user-id attribute of the clicked post
                         var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
 
+                        // Fetch the clickedUser
                         clickedUser.fetch({
+
+                            // Upon success, get the user's posts
                             success: function() {
                                 var userPosts = clickedUser.get('posts');
-                                console.log(userPosts);
 
+                                // Then create a view out of those posts
                                 var postsListView = new PostsListView({
                                     collection: userPosts,
                                     userLikesArr: that.userLikesArr
                                 });
 
+                                // And use the view's method to render the clickedUser's posts
                                 postsListView.getClickedUserPosts(clickedUser);
                             }
                         });
@@ -349,21 +353,28 @@ $(function() {
 
                                 // Populate the #main-window with the new postsListView
                                 $('#main-window').html(postsListView.render().el);
+
+                            // Otherwise, if the #main-title is not 'your favorited posts' then that means we are viewing a specific
+                            // user's posts, so re-render view accordingly
                             } else {
 
                                 // Create a UserModel from the data-user-id attribute of the clicked post
                                 var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
 
+                                // Fetch the clickedUser
                                 clickedUser.fetch({
+
+                                    // Upon success, get the user's posts
                                     success: function() {
                                         var userPosts = clickedUser.get('posts');
-                                        console.log(userPosts);
 
+                                        // Then create a view out of those posts
                                         var postsListView = new PostsListView({
                                             collection: userPosts,
                                             userLikesArr: that.userLikesArr
                                         });
 
+                                        // And use the view's method to render the clickedUser's posts
                                         postsListView.getClickedUserPosts(clickedUser);
                                     }
                                 });
