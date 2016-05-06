@@ -286,6 +286,8 @@ $(function() {
                             // Create userLikes variable to hold all likes of current user
                             var userLikes = user.get('likes');
 
+                            console.log(userLikes);
+
                             // Create a PostListView with the collection userLikes, and pass it the array of
                             // userLikes so the view knows which posts to put a red heart next to
                             var postsListView = new PostsListView({
@@ -293,10 +295,12 @@ $(function() {
                                 userLikesArr: that.userLikesArr
                             });
 
+                            console.log(postsListView);
+
                             // Populate the #main-window with the new postsListView
                             $('#main-window').html(postsListView.render().el);
 
-                            console.log('3. Render new view of favorites')
+                            console.log('3. Render new view of favorites');
 
                             // Re-render homeViews all-posts window
                             homeView.insertAllPosts();
@@ -321,11 +325,15 @@ $(function() {
 
                             var userPosts = clickedUser.get('posts');
 
+                            console.log(userPosts);
+
                             // Then create a view out of those posts
                             var postsListView = new PostsListView({
                                 collection: userPosts,
                                 userLikesArr: that.userLikesArr
                             });
+
+                            console.log(postsListView);
 
                             // And use the view's method to render the clickedUser's posts
                             postsListView.getClickedUserPosts(clickedUser);
