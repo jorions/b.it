@@ -57,47 +57,11 @@ $(function() {
                 // If the clicked link is invalid nothing happens
                 event.preventDefault();
 
-                // Set that=this so that we can use the 'this' scope inside of the success call below
-                var that = this;
-
                 // Create a UserModel from the data-user-id attribute of the clicked post
                 var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
 
-                // fetch() is asynchronous, so add a success callback to indicate what should not be run until the fetch
-                // successfully happens
-                clickedUser.fetch({
-
-                    // Populate the #main-window with all of the clicked user's posts, add a button to view your favorites,
-                    // and adjust the size of the elements so everything stays aligned along the bottom edge of the app
-                    success: function() {
-
-                        // Create PostsCollection of clickedUser's posts
-                        var posts = new PostsCollection(clickedUser.get('posts'));
-                        posts.fetch();
-
-                        // Create PostListView out of the new PostsCollection, and pass it the array of userLikes so the
-                        // view knows which posts to put a red heart next to
-                        var usersPostsListView = new PostsListView({
-                            collection: posts,
-                            userLikesArr: that.userLikesArr
-                        });
-
-                        // Populate #main-window with the new PostsListView and adjust the size as needed
-                        $('#main-window').html(usersPostsListView.render().el);
-                        $('#main-window').height("410px");
-
-                        // Create title for #main-window
-                        var mainTitle = "posts by @" + clickedUser.get('name');
-                        $('#main-title').html(mainTitle);
-
-                        // Add favorites button
-                        $('#favorites-button').html("&rarr; click to see your favorites &larr;");
-
-                        // Reset error message
-                        $('#error').html("");
-
-                    }
-                });
+                // Populate the #main-window with all posts from the clickedUser
+                this.getClickedUserPosts(clickedUser);
 
                 // Create a new PostModel to populate the #post-viewer-container with details about the post that was clicked
                 var clickedPost = new PostModel({ id: $(event.target).data('id') });
@@ -143,6 +107,49 @@ $(function() {
 
             // Return 'this' so that when we call this view's render() elsewhere we can then access 'this' view's el
             return this;
+        },
+
+        // Populate the #main-window with all posts from the passed in clickedUser
+        getClickedUserPosts: function(clickedUser) {
+
+            // Set that=this so that we can use the 'this' scope inside of the success call below
+            var that = this;
+
+            // fetch() is asynchronous, so add a success callback to indicate what should not be run until the fetch
+            // successfully happens
+            clickedUser.fetch({
+
+                // Populate the #main-window with all of the clicked user's posts, add a button to view your favorites,
+                // and adjust the size of the elements so everything stays aligned along the bottom edge of the app
+                success: function() {
+
+                    // Create PostsCollection of clickedUser's posts
+                    var posts = new PostsCollection(clickedUser.get('posts'));
+                    posts.fetch();
+
+                    // Create PostListView out of the new PostsCollection, and pass it the array of userLikes so the
+                    // view knows which posts to put a red heart next to
+                    var usersPostsListView = new PostsListView({
+                        collection: posts,
+                        userLikesArr: that.userLikesArr
+                    });
+
+                    // Populate #main-window with the new PostsListView and adjust the size as needed
+                    $('#main-window').html(usersPostsListView.render().el);
+                    $('#main-window').height("410px");
+
+                    // Create title for #main-window
+                    var mainTitle = "posts by @" + clickedUser.get('name');
+                    $('#main-title').html(mainTitle);
+
+                    // Add favorites button
+                    $('#favorites-button').html("&rarr; click to see your favorites &larr;");
+
+                    // Reset error message
+                    $('#error').html("");
+
+                }
+            });
         }
     });
 
@@ -262,8 +269,36 @@ $(function() {
                                 $('#main-window').html(postsListView.render().el);
                             }
                         });
+
+                    // Otherwise, if the id of the newly-liked/unliked post is part of the array of currently-rendered
+                    // list of the clicked user's posts, re-render the view
+                    } else {
+
+                        // Set that=this so that we can use the 'this' scope inside of the success callback below
+                        var that = this;
+                        
+                        // Create a UserModel from the data-user-id attribute of the clicked post
+                        var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
+
+                        clickedUser.fetch({
+                            success: function() {
+                                var userPosts = clickedUser.get('posts');
+                                console.log(userPosts);
+
+                                var postsListView = new PostsListView({
+                                    collection: userPosts,
+                                    userLikesArr: that.userLikesArr
+                                });
+
+                                postsListView.getClickedUserPosts(clickedUser);
+                            }
+                        });
+
+                        // Populate the #main-window with all posts from the clickedUser
+                        this.getClickedUserPosts(clickedUser);
                     }
 
+                // Otherwise if the heart is not 'normal' it is already favorited, so...
                 } else {
 
                     // Format the heart to be 'normal'
@@ -314,6 +349,27 @@ $(function() {
 
                                 // Populate the #main-window with the new postsListView
                                 $('#main-window').html(postsListView.render().el);
+                            } else {
+
+                                // Create a UserModel from the data-user-id attribute of the clicked post
+                                var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
+
+                                clickedUser.fetch({
+                                    success: function() {
+                                        var userPosts = clickedUser.get('posts');
+                                        console.log(userPosts);
+
+                                        var postsListView = new PostsListView({
+                                            collection: userPosts,
+                                            userLikesArr: that.userLikesArr
+                                        });
+
+                                        postsListView.getClickedUserPosts(clickedUser);
+                                    }
+                                });
+
+                                // Populate the #main-window with all posts from the clickedUser
+                                this.getClickedUserPosts(clickedUser);
                             }
 
                             // Re-render all posts so that they reflect the "unlike"
@@ -348,6 +404,10 @@ $(function() {
 
             // Create an array of UserLikes based off of the array passed through the options
             this.userLikesArr = options.userLikesArr;
+
+            if(options.clickedUsersPostsArr) {
+                this.clickedUsersPostsArr = options.clickedUsersPostsArr;
+            }
         },
 
         // Populate this view's el with the template
@@ -572,9 +632,16 @@ $(function() {
         }
     });
 
-    // Instantiate a new HomeView
-    var homeView = new HomeView();
+    // Get the current url path
+    var path = window.location.pathname;
 
-    // Populate the main #content div of the page with the new homeView's rendered el
-    $('#content').html(homeView.render().el);
+    // Only when the path = '/home' should you run the homeView
+    if(path === '/home') {
+
+        // Instantiate a new HomeView
+        var homeView = new HomeView();
+
+        // Populate the main #content div of the page with the new homeView's rendered el
+        $('#content').html(homeView.render().el);
+    }
 });
