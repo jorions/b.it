@@ -224,7 +224,7 @@ $(function() {
                 // If the clicked heart is 'normal' it is not favorited, so...
                 if($(event.target).attr('id') === "heart-normal") {
 
-                    // Format it to be 'favorited'
+                    // Format it to be 'favorited' (makes click feel more responsive - it will re-render anyways)
                     $(event.target).attr('id', 'heart-favorited');
 
                     // Add its post id to the array of user Likes
@@ -242,7 +242,7 @@ $(function() {
                 // Otherwise if the heart is not 'normal' it is already favorited, so...
                 } else {
 
-                    // Format the heart to be 'normal'
+                    // Format the heart to be 'normal' (makes click feel more responsive - it will re-render anyways)
                     $(event.target).attr('id', 'heart-normal');
 
                     // Remove the id of the clicked heart from the userLikes array
