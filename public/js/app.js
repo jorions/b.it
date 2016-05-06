@@ -232,7 +232,7 @@ $(function() {
                 if($(event.target).attr('id') === "heart-normal") {
 
                     // Format it to be 'favorited'
-                    $(event.target).attr('id', 'heart-favorited');
+                    //$(event.target).attr('id', 'heart-favorited');
 
                     // Add its post id to the array of user Likes
                     this.userLikesArr.push(clickedPostId);
@@ -247,7 +247,7 @@ $(function() {
                 } else {
 
                     // Format the heart to be 'normal'
-                    $(event.target).attr('id', 'heart-normal');
+                    //$(event.target).attr('id', 'heart-normal');
 
                     // Remove the id of the clicked heart from the userLikes array
                     var tempArray = [];
@@ -322,23 +322,7 @@ $(function() {
                             });
                         }
 
-                        // // Re-render all posts so that they reflect the "unlike"
-                        // var posts = new PostsCollection();
-                        // posts.fetch({
-                        //
-                        //     // Upon a successful call, create a new view of the pass it the updated array of userLikes
-                        //     success: function() {
-                        //         var postsListView = new PostsListView({
-                        //             collection: posts,
-                        //             userLikesArr: that.userLikesArr
-                        //         });
-                        //
-                        //         // Make sure to say postsListView.render().el instead of postsListView.el so that the
-                        //         // view actually renders
-                        //         $('#all-posts').html(postsListView.render().el);
-                        //     }
-                        // });
-
+                        // Re-render homeViews all-posts window
                         homeView.insertAllPosts();
                     }
                 });
