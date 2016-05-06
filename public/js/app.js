@@ -500,7 +500,9 @@ $(function() {
             "click #submit": "createPost",
 
             // If the #favorites-button is pressed then insert the view of the user's likes
-            "click #favorites-button": "insertLikes"
+            "click #favorites-button": "insertLikes",
+
+            "click .heart": "insertAllPosts"
         },
 
         render: function() {
