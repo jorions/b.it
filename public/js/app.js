@@ -225,7 +225,7 @@ $(function() {
                 if($(event.target).attr('id') === "heart-normal") {
 
                     // Format it to be 'favorited'
-                    //$(event.target).attr('id', 'heart-favorited');
+                    $(event.target).attr('id', 'heart-favorited');
 
                     // Add its post id to the array of user Likes
                     this.userLikesArr.push(clickedPostId);
@@ -243,7 +243,7 @@ $(function() {
                 } else {
 
                     // Format the heart to be 'normal'
-                    //$(event.target).attr('id', 'heart-normal');
+                    $(event.target).attr('id', 'heart-normal');
 
                     // Remove the id of the clicked heart from the userLikes array
                     var tempArray = [];
