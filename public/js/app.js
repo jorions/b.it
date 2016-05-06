@@ -243,65 +243,6 @@ $(function() {
                     });
                     clickedPost.save();
 
-                    // Add it to the window of user likes if that is the window that is currently open
-                    if($('#main-title').text() === 'your favorited posts') {
-
-                        // Set that=this so that we can use the 'this' scope inside of the success callback below
-                        var that = this;
-
-                        // Initialize a UserModel and then fetch it with the response "currentUser=true", which will trigger
-                        // the UserController's index() to return the current user with all of their likes
-                        var user = new UserModel();
-                        user.fetch({
-                            data: {
-                                currentUser: true
-                            },
-                            success: function () {
-
-                                // Create userLikes variable to hold all likes of current user
-                                var userLikes = user.get('likes');
-
-                                // Create a PostListView with the collection userLikes, and pass it the array of
-                                // userLikes so the view knows which posts to put a red heart next to
-                                var postsListView = new PostsListView({
-                                    collection: userLikes,
-                                    userLikesArr: that.userLikesArr
-                                });
-
-                                // Populate the #main-window with the new postsListView
-                                $('#main-window').html(postsListView.render().el);
-                            }
-                        });
-
-                    // Otherwise, if the #main-title is not 'your favorited posts' then that means we are viewing a specific
-                    // user's posts, so re-render view accordingly
-                    } else {
-
-                        // Set that=this so that we can use the 'this' scope inside of the success callback below
-                        var that = this;
-                        
-                        // Create a UserModel from the data-user-id attribute of the clicked post
-                        var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
-
-                        // Fetch the clickedUser
-                        clickedUser.fetch({
-
-                            // Upon success, get the user's posts
-                            success: function() {
-                                var userPosts = clickedUser.get('posts');
-
-                                // Then create a view out of those posts
-                                var postsListView = new PostsListView({
-                                    collection: userPosts,
-                                    userLikesArr: that.userLikesArr
-                                });
-
-                                // And use the view's method to render the clickedUser's posts
-                                postsListView.getClickedUserPosts(clickedUser);
-                            }
-                        });
-                    }
-
                 // Otherwise if the heart is not 'normal' it is already favorited, so...
                 } else {
 
@@ -310,8 +251,8 @@ $(function() {
 
                     // Remove the id of the clicked heart from the userLikes array
                     var tempArray = [];
-                    this.userLikesArr.forEach(function(likedId) {
-                        if(likedId != clickedPostId) {
+                    this.userLikesArr.forEach(function (likedId) {
+                        if (likedId != clickedPostId) {
                             tempArray.push(likedId);
                         }
                     });
@@ -322,86 +263,85 @@ $(function() {
                         id: clickedPostId
                     });
                     clickedPost.destroy();
+                }
 
-                    // Prepare to re-render the necessary parts of the page by preparing a new UserModel
-                    // Initialize a UserModel
-                    var user = new UserModel();
+                // Prepare to re-render the necessary parts of the page by preparing a new UserModel
+                // Initialize a UserModel
+                var user = new UserModel();
 
-                    // Set that=this so that we can use the 'this' scope inside of the success callback below
-                    var that = this;
+                // Set that=this so that we can use the 'this' scope inside of the success callback below
+                var that = this;
 
-                    // fetch() the new UserModel with the response "currentUser=true", which will trigger the UserController's
-                    // index() to return the current user with all of their likes
-                    user.fetch({
-                        data: {
-                            currentUser: true
-                        },
-                        success: function () {
+                // fetch() the new UserModel with the response "currentUser=true", which will trigger the UserController's
+                // index() to return the current user with all of their likes
+                user.fetch({
+                    data: {
+                        currentUser: true
+                    },
+                    success: function () {
 
-                            // Remove unliked post from the window of user likes if that is the window that is currently open
-                            if($('#main-title').text() === 'your favorited posts') {
+                        // Remove unliked post from the window of user likes if that is the window that is currently open
+                        if($('#main-title').text() === 'your favorited posts') {
 
-                                // Create userLikes variable to hold all likes of current user
-                                var userLikes = user.get('likes');
+                            // Create userLikes variable to hold all likes of current user
+                            var userLikes = user.get('likes');
 
-                                // Create a PostListView with the collection userLikes, and pass it the array of
-                                // userLikes so the view knows which posts to put a red heart next to
-                                var postsListView = new PostsListView({
-                                    collection: userLikes,
-                                    userLikesArr: that.userLikesArr
-                                });
+                            // Create a PostListView with the collection userLikes, and pass it the array of
+                            // userLikes so the view knows which posts to put a red heart next to
+                            var postsListView = new PostsListView({
+                                collection: userLikes,
+                                userLikesArr: that.userLikesArr
+                            });
 
-                                // Populate the #main-window with the new postsListView
-                                $('#main-window').html(postsListView.render().el);
+                            // Populate the #main-window with the new postsListView
+                            $('#main-window').html(postsListView.render().el);
 
-                            // Otherwise, if the #main-title is not 'your favorited posts' then that means we are viewing a specific
-                            // user's posts, so re-render view accordingly
-                            } else {
+                        // Otherwise, if the #main-title is not 'your favorited posts' then that means we are viewing a specific
+                        // user's posts, so re-render view accordingly
+                        } else {
 
-                                // Create a UserModel from the data-user-id attribute of the clicked post
-                                var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
+                            // Create a UserModel from the data-user-id attribute of the clicked post
+                            var clickedUser = new UserModel({ id: $(event.target).data('user-id') });
 
-                                // Fetch the clickedUser
-                                clickedUser.fetch({
+                            // Fetch the clickedUser
+                            clickedUser.fetch({
 
-                                    // Upon success, get the user's posts
-                                    success: function() {
-                                        var userPosts = clickedUser.get('posts');
-
-                                        // Then create a view out of those posts
-                                        var postsListView = new PostsListView({
-                                            collection: userPosts,
-                                            userLikesArr: that.userLikesArr
-                                        });
-
-                                        // And use the view's method to render the clickedUser's posts
-                                        postsListView.getClickedUserPosts(clickedUser);
-                                    }
-                                });
-                            }
-
-                            // Re-render all posts so that they reflect the "unlike"
-                            var posts = new PostsCollection();
-                            posts.fetch({
-
-                                // Upon a successful call, create a new view of the pass it the updated array of userLikes
+                                // Upon success, get the user's posts
                                 success: function() {
+                                    var userPosts = clickedUser.get('posts');
+
+                                    // Then create a view out of those posts
                                     var postsListView = new PostsListView({
-                                        collection: posts,
+                                        collection: userPosts,
                                         userLikesArr: that.userLikesArr
                                     });
 
-                                    // Make sure to say postsListView.render().el instead of postsListView.el so that the
-                                    // view actually renders
-                                    $('#all-posts').html(postsListView.render().el);
+                                    // And use the view's method to render the clickedUser's posts
+                                    postsListView.getClickedUserPosts(clickedUser);
                                 }
                             });
                         }
-                    });
-                }
 
-                // Re-render all posts to be safe
-                homeView.insertAllPosts();
+                        // // Re-render all posts so that they reflect the "unlike"
+                        // var posts = new PostsCollection();
+                        // posts.fetch({
+                        //
+                        //     // Upon a successful call, create a new view of the pass it the updated array of userLikes
+                        //     success: function() {
+                        //         var postsListView = new PostsListView({
+                        //             collection: posts,
+                        //             userLikesArr: that.userLikesArr
+                        //         });
+                        //
+                        //         // Make sure to say postsListView.render().el instead of postsListView.el so that the
+                        //         // view actually renders
+                        //         $('#all-posts').html(postsListView.render().el);
+                        //     }
+                        // });
+
+                        homeView.insertAllPosts();
+                    }
+                });
             }
         },
 
