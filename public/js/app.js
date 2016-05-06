@@ -139,7 +139,7 @@ $(function() {
 
                     // Populate #main-window with the new PostsListView and adjust the size as needed
                     $('#main-window').html(usersPostsListView.render().el);
-                    $('#main-window').height("410px");
+                    $('#main-window').height("408px");
 
                     // Create title for #main-window
                     var mainTitle = "posts by @" + clickedUser.get('name');
@@ -599,7 +599,7 @@ $(function() {
                     that.$el.find('#main-title').html('your favorited posts');
 
                     // Set the #main-window to the proper height to compensate for the lack of a #favorites-button
-                    that.$el.find('#main-window').height("442px");
+                    that.$el.find('#main-window').height("440px");
                     that.$el.find('#favorites-button').html("");
 
                     // Reset error message
