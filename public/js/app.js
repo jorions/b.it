@@ -180,7 +180,7 @@ $(function() {
         initialize: function() {
 
             // Whenever the model for this view is changed, re-render this view
-            this.listenTo(this.model, 'change', this.render);
+            //this.listenTo(this.model, 'change', this.render);
         },
 
         // This populates the el with the template
@@ -335,7 +335,7 @@ $(function() {
         initialize: function(options) {
 
             // Listen for changes to the view's model. Upon a change, re-render
-            this.listenTo(this.model, 'change', this.render);
+            //this.listenTo(this.model, 'change', this.render);
 
             // Create an array of UserLikes based off of the array passed through the options
             this.userLikesArr = options.userLikesArr;
