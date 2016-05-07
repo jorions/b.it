@@ -310,6 +310,9 @@ $(function() {
 
                                     // Populate the #main-window with the new postsListView
                                     $('#main-window').html(postsListView.render().el);
+
+                                    // Re-render homeViews all-posts window
+                                    homeView.insertAllPosts();
                                 }
                             });
                         }
@@ -338,12 +341,12 @@ $(function() {
 
                             // And use the view's method to render the clickedUser's posts
                             postsListView.getClickedUserPosts(clickedUser);
+
+                            // Re-render homeViews all-posts window
+                            homeView.insertAllPosts();
                         }
                     });
                 }
-
-                // Re-render homeViews all-posts window
-                homeView.insertAllPosts();
 
             }
         },
