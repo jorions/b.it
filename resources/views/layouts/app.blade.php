@@ -104,7 +104,7 @@
             text-align: center;
             color: #3592b2;
             overflow: hidden;
-            height: 78px;
+            height: 76px;
 
         }
 
