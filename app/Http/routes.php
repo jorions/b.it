@@ -12,7 +12,7 @@
 */
 
 // Everything in this group has access to the CSRF Token (web middleware has access to this, as shown in Kernel.php)
-Route::group(['middleware' => 'web'], function () {
+Route::group(['middlewareGroups' => 'web'], function () {
     Route::auth();
 
     Route::get('/home', 'HomeController@index');
